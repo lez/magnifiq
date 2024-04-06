@@ -1,0 +1,147 @@
+:root {
+  --gray1: rgb(0, 0, 0);
+  --gray2: rgb(15, 15, 15);
+  --gray3: rgb(30, 30, 30);
+  --gray4: rgb(45, 45, 45);
+  --gray5: rgb(60, 60, 60);
+  --gray6: rgb(75, 75, 75);
+  --gray7: rgb(90, 90, 90);
+  --gray8: rgb(105, 105, 105);
+  --gray9: rgb(120, 120, 120);
+  --gray10: rgb(135, 135, 135);
+  --gray11: rgb(150, 150, 150);
+  --gray12: rgb(165, 165, 165);
+  --gray13: rgb(180, 180, 180);
+  --gray14: rgb(195, 195, 195);
+  --gray15: rgb(210, 210, 210);
+  --gray16: rgb(225, 225, 225);
+  --gray17: rgb(240, 240, 240);
+  --gray18: rgb(255, 255, 255);
+  --aqua1: rgb(5,48,48);
+  --aqua2: rgb(8,84,84);
+  --aqua3: rgb(14,140,140);
+  --aqua35: #38a3af;
+  --aqua4: rgb(86,174,174);
+  --aqua5: rgb(146,203,203);
+  --purple1: rgb(43,31,78);
+  --purple2: rgb(76,55,138);
+  --purple3: rgb(127,92,230);
+  --purple4: rgb(165,141,237);
+  --purple5: rgb(197,182,244);
+  --blue1: rgb(14,43,71);
+  --blue2: rgb(25,75,124);
+  --blue3: rgb(46,127,207);
+  --blue4: rgb(105,164,221);
+  --blue5: rgb(159,196,233);
+  --pink1: rgb(61,22,55);
+  --pink2: rgb(107,38,96);
+  --pink3: rgb(179,66,160);
+  --pink4: rgb(202,121,188);
+  --pink5: rgb(221,169,212);
+  --red1: rgb(67,24,24);
+  --red2: rgb(118,41,41);
+  --red3: rgb(196,74,74);
+  --red4: rgb(214,125,125);
+  --red5: rgb(228,171,171);
+  --orange1: rgb(70,34,14);
+  --orange2: rgb(122,61,25);
+  --orange3: rgb(91,60,133);
+  --orange4: rgb(204,104,47);
+  --orange5: rgb(232,186,159);
+  --yellow1: rgb(61,46,0);
+  --yellow2: rgb(107,81,0);
+  --yellow3: rgb(179,135,0);
+  --yellow4: rgb(202,171,76);
+  --yellow5: rgb(221,201,140);
+  --green1: rgb(37,49,14);
+  --green2: rgb(64,87,25);
+  --green3: rgb(107,145,41);
+  --green4: rgb(151,178,105);
+  --green5: rgb(188,205,159);
+}
+
+/* semantic color variables for this project */
+:root {
+  --bg1: var(--gray18);
+  --bg2: var(--gray17);
+  --bg3: var(--gray16);
+  --bg4: var(--gray15);
+  --bg5: var(--gray14);
+  --content-bg1: var(--gray18);
+  --text1: var(--gray1);
+  --text2: var(--gray3);
+  --text3: var(--gray5);
+  --text4: var(--gray7);
+  --text5: var(--gray9);
+  --primary1: var(--aqua3);
+  --primary2: var(--aqua4);
+  --secondary1: var(--purple3);
+  --secondary2: var(--purple4);
+  --link1: var(--primary1);
+  --link2: var(--primary2);
+  --logo: var(--aqua35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg1: var(--gray1);
+    --bg2: var(--gray2);
+    --bg3: var(--gray3);
+    --bg4: var(--gray4);
+    --bg5: var(--gray5);
+    --content-bg1: var(--gray3);
+    --text1: var(--gray18);
+    --text2: var(--gray16);
+    --text3: var(--gray14);
+    --text4: var(--gray12);
+    --text5: var(--gray10);
+    --primary1: var(--aqua35);
+    --primary2: var(--aqua4);
+    --secondary1: var(--purple3);
+    --secondary2: var(--purple4);
+    --link1: var(--primary1);
+    --link2: var(--primary2);
+    --logo: var(--text2);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+body {
+  min-height: 100%;
+  color: var(--text2);
+  background: var(--bg2);
+  transition: color 0.2s, background-color 0.2s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 20px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: var(--text1);
+  text-align: center;
+}

@@ -1,0 +1,20 @@
+{
+  "name": "magnifiq",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@nostr-dev-kit/ndk": "^2.7.1",
+    "vue": "^3.4.21",
+    "vue-multiselect": "^3.0.0-beta.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.1.6"
+  }
+}
