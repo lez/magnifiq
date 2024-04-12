@@ -11,9 +11,12 @@ def tags(request):
     if not prefix:
         return {"tags": []}
 
-    prefix = prefix.replace("%", "\\%").replace("\\", "\\\\") + "%"
+    prefix = prefix.replace(r"\\", "\\\\").replace("%", "\\%") + "%"
+
     q = db.execute(
-    	"SELECT DISTINCT value FROM tag WHERE name='s' AND value LIKE :prefix ESCAPE '\\'", dict(prefix=prefix))
+    	"SELECT DISTINCT value FROM tag"\
+        " WHERE name='s' AND value LIKE :prefix ESCAPE '\\'",
+            dict(prefix=prefix))
 
     tags = list(map(lambda x: x[0], q.fetchall()))
     return {"tags": tags}
