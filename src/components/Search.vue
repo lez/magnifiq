@@ -58,7 +58,7 @@ import stamp from "../../svg/stamp.svg?raw"
         </div>
 
         <div class="author">
-          Indexed by <user :pubkey="r.pubkey" :ndk="ndk"/>
+          Indexed by <user :pubkey="r.pubkey" :ndk="ndk" @click.once.prevent="onAuthorClick(r)"/>
           <trust :king="root" :author="r.pubkey" context="search" :ndk="ndk" :search_ndk="search_ndk"/>
         </div>
       </div>
@@ -96,6 +96,11 @@ export default {
     this.ndk.connect()
   },
   methods: {
+    async onAuthorClick (result) {
+      console.log("Click", result.pubkey);
+      let u = this.ndk.getUser({pubkey: result.pubkey})
+      this.value = ["indexer:"+u.npub]
+    },
     async onOptionSelected (option) {
       console.log("onOptionSelected", option)
     },
@@ -118,22 +123,39 @@ export default {
 
 
     async onButtonClick (x) {
-      console.log("ButtonClick", x)
-      console.log("this.value", this.value)
+      console.log("Search!", Array.from(this.value))
 
-      let tags = Array.from(this.value)
-      console.log("Tags:", tags)
+      let tags = []
+      let indexer = null
+
+      for (let t of this.value) {
+        if (t.startsWith("indexer:")) {
+          let npub = t.slice("indexer:".length)
+          let u = this.ndk.getUser({ npub })
+          indexer = u.pubkey
+        } else {
+          tags.push(t)
+        }
+      }
 
       let filter = {
         kinds: [78],
-        "&s": tags,
-        trust: {
+      }
+      if (tags.length) {
+        filter["&s"] = tags
+      }
+
+      if (indexer) {
+        filter.authors = [indexer]
+      } else {
+        filter.trust = {
           root: this.root,
           context: "search",
           depth: 4
         }
       }
 
+      console.log("REQ filter", filter)
       let events = await this.search_ndk.fetchEvents(filter)
 
       this.results = Array.from(events).sort((a, b) => {
