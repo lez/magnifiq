@@ -1,3 +1,8 @@
+<script setup>
+import NDK, { NDKEvent, NDKNip07Signer }  from "@nostr-dev-kit/ndk";
+import Multiselect from 'vue-multiselect'
+</script>
+
 <template>
   <header>
     <a href="/">
@@ -74,18 +79,18 @@
 </template>
 
 <script>
-import NDK, { NDKEvent, NDKNip07Signer }  from "@nostr-dev-kit/ndk";
-import Multiselect from 'vue-multiselect'
-
 export default {
   data () {
     return {
+      // ndk
       ndk: null,
       npub: null,
       user: null,
+      // autocomplete
       isLoading: false,
       tags: [],
       options: [],
+      // after submit
       stored: false,
       stored_event: null,
     }

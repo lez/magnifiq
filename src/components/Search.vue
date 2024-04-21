@@ -1,3 +1,11 @@
+<script setup>
+import Multiselect from 'vue-multiselect'
+import NDK from "@nostr-dev-kit/ndk";
+import Trust from './Trust.vue'
+import User from "./User.vue"
+import stamp from "../../svg/stamp.svg?raw"
+</script>
+
 <template>
   <div>
     <div class="search">
@@ -35,9 +43,10 @@
           <a v-if="getTagValue(r, 'dest')" :href="getTagValue(r, 'dest')">{{ getTagValue(r, 'dest') }}</a>
           <span v-else class="missing">Missing destination!</span>
           <!-- <span class="explore"><a :href="'https://njump.me/'+r.id">o</a></span> --><!-- TODO: add relay data to nevent -->
-          <div class="content">
-            {{ r.content }}
-          </div>
+        </div>
+
+        <div class="content">
+          {{ r.content }}
         </div>
 
         <div class="tags">
@@ -47,34 +56,44 @@
             </span>
           </template>
         </div>
+
+        <div class="author">
+          Indexed by <user :pubkey="r.pubkey" :ndk="ndk"/>
+          <trust :king="root" :author="r.pubkey" context="search" :ndk="ndk" :search_ndk="search_ndk"/>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
-import NDK from "@nostr-dev-kit/ndk";
-
 export default {
-  components: { Multiselect },
+  components: { Multiselect, Trust, User },
   data () {
     return {
       value: [],
       isLoading: false,
       options: [],
       results: [],
-      ndk: null
+      ndk: null,
+      search_ndk: null,
+      root: "cfd7df62799a22e384a4ab5da8c4026c875b119d0f47c2716b20cdac9cc1f1a6",
     }
   },
   mounted: function() {
     window.x = this
     this.$refs.search.activate()
     window.localStorage.debug = ''
-    this.ndk = new NDK({
+
+    this.search_ndk = new NDK({
       explicitRelayUrls: ["ws://127.0.0.1:8080"],
-    });
-    this.ndk.connect();
+    })
+    this.search_ndk.connect()
+
+    this.ndk = new NDK({
+      explicitRelayUrls: ["wss://bitcoinmaximalists.online"],
+    })
+    this.ndk.connect()
   },
   methods: {
     async onOptionSelected (option) {
@@ -97,34 +116,49 @@ export default {
       this.isLoading = false
     },
 
+
     async onButtonClick (x) {
       console.log("ButtonClick", x)
       console.log("this.value", this.value)
 
-      let tags =  Array.from(this.value)
+      let tags = Array.from(this.value)
       console.log("Tags:", tags)
 
-      let filter = { kinds: [78], "&s": tags }
-
-      let events = await this.ndk.fetchEvents(filter)
-
-      console.log("Events:", Array.from(events))
-      function scnt(e){
-        let n = 0
-        for (let t of e.tags){
-          if (t[0] == "s") {
-            n += 1
-          }
+      let filter = {
+        kinds: [78],
+        "&s": tags,
+        trust: {
+          root: this.root,
+          context: "search",
+          depth: 4
         }
-        return n
       }
+
+      let events = await this.search_ndk.fetchEvents(filter)
+
       this.results = Array.from(events).sort((a, b) => {
-        if (this.getTagValue(a, "D") && !this.getTagValue(b, "D")) return -1;
-        if (!this.getTagValue(a, "D") && this.getTagValue(b, "D")) return 1;
-        if (scnt(a) < scnt(b)) return -1;
-        if (scnt(a) > scnt(b)) return 1;
+        // Invalid events go to the bottom.
+        if (this.getTagValue(a, "dest") && !this.getTagValue(b, "dest")) return -1;
+        if (!this.getTagValue(a, "dest") && this.getTagValue(b, "dest")) return 1;
+
+        // Fewer tags are ranked better to avoid tag bloat.
+        if (this.scnt(a) < this.scnt(b)) return -1;
+        if (this.scnt(a) > this.scnt(b)) return 1;
+
         return 0;
       })
+
+      console.log("Results", this.results)
+    },
+
+    scnt (event) {
+      let n = 0
+      for (let t of event.tags){
+        if (t[0] == "s") {
+          n += 1
+        }
+      }
+      return n
     },
 
     // Return first value of tag by tagname.
@@ -227,9 +261,11 @@ input.multiselect__input:focus {
   font-size: 20px;
 }
 .tags span {
-  background: var(--aqua2);
-  padding: 4px;
+  background: var(--aqua3);
+  color: white;
+  padding: 2px 6px;
   margin-right: 12px;
+  border-radius: 8px;
 }
 .afterList {
   display: flex;
@@ -242,5 +278,11 @@ input.multiselect__input:focus {
 }
 .missing {
   background: red;
+}
+.author {
+  color: var(--text5);
+}
+svg {
+  fill: var(--text5);
 }
 </style>

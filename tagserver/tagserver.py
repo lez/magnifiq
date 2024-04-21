@@ -9,9 +9,10 @@ db = db.cursor()
 def tags(request):
     prefix = request.params.get("prefix")
     if not prefix:
+        # Missing or empty prefix.
         return {"tags": []}
 
-    prefix = prefix.replace(r"\\", "\\\\").replace("%", "\\%") + "%"
+    prefix = prefix.replace("\\", "\\\\").replace("%", "\\%") + "%"
 
     q = db.execute(
     	"SELECT DISTINCT value FROM tag"\

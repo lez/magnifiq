@@ -2,14 +2,15 @@
 
 <img src="https://github.com/lez/magnifiq/blob/master/public/image/logo.png\?raw=true" alt="logo" width="500"/>
 
-This is a Nostr search engine based on Nostr.
-Its aim is to help discover Nostr apps, services, people, events and other stuff.
+A Nostr search engine based on Nostr.
+
+It aims to help discover Nostr apps, services, people, events and other stuff.
 
 Use github issues to report bugs, feature requests, questions, suggestions.
 
 ## Setup
 
-This app uses a special relay feature, filtering tags by AND operand. This is added in https://github.com/lez/nostr-rs-relay The feature adds a `"&t"` key in REQ filters, which return results if ALL of its values show up in the `tags` field of an event.
+This app uses a special relay feature, filtering tags using AND operand. This is added in https://github.com/lez/nostr-rs-relay The feature adds a `"&t"` key in REQ filters, which return results if ALL values in the REQ shows up as `t` tag of an event.
 
 It also uses `kind:30077` trust events specified here: https://github.com/lez/nips/77.md
 
