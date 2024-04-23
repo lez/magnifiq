@@ -11,11 +11,13 @@ import stamp from "/svg/stamp.svg?raw"
       <a href="#" class="stamp-outer"><div class="stamp" v-html="stamp"></div></a>
       <template #content>
         <div class="hovercard">
-          Trust for
-          <pre>{{ context }}</pre>
+          <div class="content-header">
+            Trust for <span class="context">{{ context }}</span>
+          </div>
           <div v-if="!trust">Loading...</div>
           <div v-else>
-            <user :pubkey="trust[0].pubkey" :ndk="ndk"/>
+            <user :pubkey="king" :ndk="ndk"/>
+            <span v-if="trust.length == 0">is king.</span>
 
             <div v-for="(t, idx) of trust" :key="t.pubkey">
               <div class="dotted"></div>
@@ -38,6 +40,11 @@ export default {
   data: function () {
     return {
       trust: null,
+    }
+  },
+  beforeMount() {
+    if (this.king === this.author) {
+      this.trust = []
     }
   },
   methods: {
@@ -124,5 +131,12 @@ export default {
   width: 24px;
   height: 16px;
   padding: 0 4px;
+}
+.content-header {
+  white-space: nowrap;
+}
+.context {
+  font-family: Consolas, Menlo, "Liberation Mono", Courier, monospace;
+  border: 1px solid var(--bg5);
 }
 </style>
