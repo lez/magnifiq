@@ -1,5 +1,5 @@
 <script setup>
-import Multiselect from 'vue-multiselect'
+import Multiselect from './multiselect/Multiselect.vue'
 import NDK from "@nostr-dev-kit/ndk";
 import Trust from './Trust.vue'
 import User from "./User.vue"
@@ -202,7 +202,6 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style>
 .multiselect {

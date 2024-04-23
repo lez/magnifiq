@@ -1,6 +1,6 @@
 <script setup>
 import NDK, { NDKEvent, NDKNip07Signer }  from "@nostr-dev-kit/ndk";
-import Multiselect from 'vue-multiselect'
+import Multiselect from './components/multiselect/Multiselect.vue'
 </script>
 
 <template>
@@ -178,7 +178,6 @@ export default {
 }
 </script>
 
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style>
 h3 {
   margin: 1em;
