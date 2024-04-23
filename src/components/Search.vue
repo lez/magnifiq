@@ -3,6 +3,7 @@ import Multiselect from 'vue-multiselect'
 import NDK from "@nostr-dev-kit/ndk";
 import Trust from './Trust.vue'
 import User from "./User.vue"
+import KingSelect from "./KingSelect.vue"
 import stamp from "../../svg/stamp.svg?raw"
 </script>
 
@@ -33,6 +34,11 @@ import stamp from "../../svg/stamp.svg?raw"
         </template>
       </multiselect>
 
+      <div class="menu-line">
+        <div style="margin-left: auto;" />
+        <king-select v-model="king" :value="king" :ndk="ndk" />
+      </div>
+
       <button class="search-button" :disabled="!value.length" @click="onButtonClick">Search</button>
     </div>
 
@@ -59,7 +65,7 @@ import stamp from "../../svg/stamp.svg?raw"
 
         <div class="author">
           Indexed by <user :pubkey="r.pubkey" :ndk="ndk" @click.once.prevent="onAuthorClick(r)"/>
-          <trust :king="root" :author="r.pubkey" context="search" :ndk="ndk" :search_ndk="search_ndk"/>
+          <trust :king="king" :author="r.pubkey" context="search" :ndk="ndk" :search_ndk="search_ndk"/>
         </div>
       </div>
     </div>
@@ -68,7 +74,7 @@ import stamp from "../../svg/stamp.svg?raw"
 
 <script>
 export default {
-  components: { Multiselect, Trust, User },
+  components: { Multiselect, Trust, User, KingSelect },
   data () {
     return {
       value: [],
@@ -77,7 +83,7 @@ export default {
       results: [],
       ndk: null,
       search_ndk: null,
-      root: "cfd7df62799a22e384a4ab5da8c4026c875b119d0f47c2716b20cdac9cc1f1a6",
+      king: "cfd7df62799a22e384a4ab5da8c4026c875b119d0f47c2716b20cdac9cc1f1a6",
     }
   },
   mounted: function() {
@@ -149,7 +155,7 @@ export default {
         filter.authors = [indexer]
       } else {
         filter.trust = {
-          root: this.root,
+          root: this.king,
           context: "search",
           depth: 4
         }
@@ -248,7 +254,7 @@ input.multiselect__input:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 40px;
+  gap: 4px;
   width: 760px;
   margin: 0 auto 16px auto;
 }
@@ -306,5 +312,10 @@ input.multiselect__input:focus {
 }
 svg {
   fill: var(--text5);
+}
+.menu-line {
+  width: 760px;
+  display: flex;
+  flex-direction: row;
 }
 </style>
