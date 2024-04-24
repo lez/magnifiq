@@ -86,20 +86,24 @@ export default {
       king: "cfd7df62799a22e384a4ab5da8c4026c875b119d0f47c2716b20cdac9cc1f1a6",
     }
   },
+  beforeMount () {
+    let search_relays = ["ws://127.0.0.1:8080"]
+    let profile_relays = ["wss://bitcoinmaximalists.online"]
+
+    this.search_ndk = new NDK({
+      explicitRelayUrls: search_relays
+    })
+    this.ndk = new NDK({
+      explicitRelayUrls: search_relays.concat(profile_relays)
+    })
+  },
   mounted: function() {
     window.x = this
     this.$refs.search.activate()
     window.localStorage.debug = ''
 
-    this.search_ndk = new NDK({
-      explicitRelayUrls: ["ws://127.0.0.1:8080"],
-    })
-    this.search_ndk.connect()
-
-    this.ndk = new NDK({
-      explicitRelayUrls: ["wss://bitcoinmaximalists.online"],
-    })
     this.ndk.connect()
+    this.search_ndk.connect()
   },
   methods: {
     async onAuthorClick (result) {
