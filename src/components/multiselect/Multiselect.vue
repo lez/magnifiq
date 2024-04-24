@@ -23,7 +23,6 @@
         :values="visibleValues"
         :is-open="isOpen"
       >
-        <div class="multiselect__tags-wrap" v-show="visibleValues.length > 0">
           <template v-for="(option, index) of visibleValues" @mousedown.prevent>
             <slot name="tag" :option="option" :search="search" :remove="removeElement">
               <span class="multiselect__tag" :key="index">
@@ -33,7 +32,6 @@
               </span>
             </slot>
           </template>
-        </div>
         <template v-if="internalValue && internalValue.length > limit">
           <slot name="limit">
             <strong class="multiselect__strong" v-text="limitText(internalValue.length - limit)"/>
@@ -356,7 +354,7 @@ export default {
       ) {
         // Hide input by setting the width to 0 allowing it to receive focus
         return this.isOpen
-          ? {width: '100%'}
+          ? {width: '150px'}
           : {width: '0', position: 'absolute', padding: '0'}
       }
       return ''
@@ -502,11 +500,12 @@ export default {
   .multiselect__single {
     position: relative;
     display: inline-block;
+    flex-grow: 0;
     min-height: 20px;
     line-height: 20px;
     border: none;
     border-radius: 5px;
-    background: #fff;
+    background: var(--bg0);
     padding: 0 0 0 5px;
     width: calc(100%);
     transition: border 0.1s ease;
@@ -540,13 +539,10 @@ export default {
     margin-bottom: 8px;
   }
 
-  .multiselect__tags-wrap {
-    display: inline;
-  }
-
   .multiselect__tags {
     min-height: 40px;
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
     padding: 8px 40px 0 8px;
     border-radius: 5px;
     border: 1px solid #e8e8e8;
@@ -557,17 +553,16 @@ export default {
   .multiselect__tag {
     position: relative;
     display: inline-block;
-    padding: 4px 26px 4px 10px;
+    padding: 8px 26px 4px 10px;
     border-radius: 5px;
     margin-right: 10px;
     color: #fff;
     line-height: 1;
     background: #41b883;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
     white-space: nowrap;
-    overflow: hidden;
     max-width: 100%;
-    text-overflow: ellipsis;
+    user-select: none;
   }
 
   .multiselect__tag-icon {

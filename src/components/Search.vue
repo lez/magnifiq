@@ -39,7 +39,7 @@ import stamp from "../../svg/stamp.svg?raw"
         <king-select v-model="king" :value="king" :ndk="ndk" />
       </div>
 
-      <button class="search-button" :disabled="!value.length" @click="onButtonClick">Search</button>
+      <button class="search-button" :disabled="!value.length" @click="onSearch">Search</button>
     </div>
 
     <div class="results">
@@ -127,8 +127,7 @@ export default {
       this.isLoading = false
     },
 
-
-    async onButtonClick (x) {
+    async onSearch (x) {
       console.log("Search!", Array.from(this.value))
 
       let tags = []

@@ -539,6 +539,10 @@ export default {
 
         /* istanbul ignore else */
         if (this.clearOnSelect) this.search = ''
+
+        if (this.multiple) {
+          this.$nextTick(() => this.activate())
+        }
       }
       /* istanbul ignore else */
       if (this.closeOnSelect) this.deactivate()
