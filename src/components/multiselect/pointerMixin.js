@@ -68,6 +68,8 @@ export default {
       /* istanbul ignore else */
       if (this.filteredOptions.length > 0) {
         this.select(this.filteredOptions[this.pointer], key)
+      } else {
+        this.$emit('submit')
       }
       this.pointerReset()
     },

@@ -401,7 +401,7 @@ export default {
       this.$emit('search-change', this.search)
     }
   },
-  emits: ['open', 'search-change', 'close', 'select', 'update:modelValue', 'remove', 'tag'],
+  emits: ['open', 'search-change', 'close', 'select', 'update:modelValue', 'remove', 'tag', 'submit'],
   methods: {
     /**
      * Returns the internalValue in a way it can be emited to the parent
@@ -724,6 +724,12 @@ export default {
         this.preferredOpenDirection = 'above'
         this.optimizedHeight = Math.min(spaceAbove - 40, this.maxHeight)
       }
+    },
+    /**
+     * When enter is pressed after entering a tag, the search action will be triggered.
+     */
+    onSubmit () {
+      this.$emit('submit')
     }
   }
 }

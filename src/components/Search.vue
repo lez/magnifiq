@@ -23,6 +23,7 @@ import stamp from "../../svg/stamp.svg?raw"
           :close-on-select="true"
           @search-change="onSearchChange"
           @select="onOptionSelected"
+          @submit="onSearch"
           :optionsLimit="20"
           :showNoOptions="false"
           :max="5">
@@ -132,6 +133,10 @@ export default {
     },
 
     async onSearch (x) {
+      if (this.value.length == 0) {
+        console.log("No tags, no search.")
+        return
+      }
       console.log("Search!", Array.from(this.value))
 
       let tags = []
