@@ -11,9 +11,6 @@
     class="multiselect"
     role="combobox"
     :aria-owns="'listbox-'+id">
-    <slot name="caret" :toggle="toggle">
-      <div @mousedown.prevent.stop="toggle()" class="multiselect__select"></div>
-    </slot>
     <slot name="clear" :search="search"></slot>
     <div ref="tags" class="multiselect__tags">
       <slot
@@ -38,11 +35,6 @@
           </slot>
         </template>
       </slot>
-      <transition name="multiselect__loading">
-        <slot name="loading">
-          <div v-show="loading" class="multiselect__spinner"/>
-        </slot>
-      </transition>
       <input
         ref="search"
         v-if="searchable"
