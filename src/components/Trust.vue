@@ -8,18 +8,16 @@ import stamp from "/svg/stamp.svg?raw"
 <template>
   <span class="trust">
     <Popper placement="right-end" @open:popper="onFetchTrust()">
-      <div class="stamp" v-html="stamp"></div>
+      <a href="#" class="stamp-outer"><div class="stamp" v-html="stamp"></div></a>
       <template #content>
         <div class="hovercard">
           <div class="content-header">
             Trust for <span class="context">{{ context }}</span>
           </div>
-          <div v-if="trust === undefined">Loading...</div>
-          <div v-else-if="trust === false">Error fetching trust</div>
-          <div v-else-if="trust === null">Not trusted</div>
+          <div v-if="!trust">Loading...</div>
           <div v-else>
             <user :pubkey="king" :ndk="ndk"/>
-            <span v-if="trust && trust.length === 0">is king.</span>
+            <span v-if="trust.length == 0">is king.</span>
 
             <div v-for="(t, idx) of trust" :key="t.pubkey">
               <div class="dotted"></div>
@@ -41,7 +39,7 @@ export default {
   components: { Popper, User },
   data: function () {
     return {
-      trust: undefined,
+      trust: null,
     }
   },
   beforeMount() {
@@ -73,19 +71,9 @@ export default {
           members: [this.author],
         }
       }
-
-      try {
-        let r = await this.search_ndk.fetchEvents(filter)
-      } catch (e) {
-        this.trust = false
-        return
-      }
+      let r = await this.search_ndk.fetchEvents(filter)
 
       console.log('trust events response', r)
-      if (r.size === 0) {
-        this.trust = null
-        return
-      }
       this.trust = []
       let truster = this.king
 
@@ -102,7 +90,7 @@ export default {
         this.trust.push(mapping[truster])
         truster = this.getTagValue(mapping[truster], 'p')
       }
-      console.log("web of trust from author", this.trust);
+      console.log("trust trail leading to author", this.trust);
     },
   },
 }
@@ -121,7 +109,7 @@ export default {
 
 <style scoped>
 /* popper content */
-.hovercard {
+.hovercard:deep {
   display: flex;
   flex-direction: column;
   font-weight: bold;
@@ -143,7 +131,6 @@ export default {
   width: 24px;
   height: 16px;
   padding: 0 4px;
-  cursor: pointer;
 }
 .content-header {
   white-space: nowrap;
