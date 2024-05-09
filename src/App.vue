@@ -12,11 +12,11 @@ import Search from './components/Search.vue'
   </main>
 
   <footer>
-    Made by <a href="https://njump.me/npub1elta7cneng3w8p9y4dw633qzdjr4kyvaparuyuttyrx6e8xp7xnq32cume">Lez</a>
+    built by <a href="https://njump.me/npub1elta7cneng3w8p9y4dw633qzdjr4kyvaparuyuttyrx6e8xp7xnq32cume">lez</a>
     -
-    <a href="https://github.com/lez/magnifiq">Source code</a>
+    <a href="https://github.com/lez/magnifiq">source code</a>
     -
-    <a href="/createindex">Create index</a>
+    <a href="/createindex">add your site</a>
   </footer>
 </template>
 

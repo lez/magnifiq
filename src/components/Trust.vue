@@ -3,12 +3,15 @@
 import Popper from "vue3-popper"
 import User from "./User.vue"
 import stamp from "/svg/stamp.svg?raw"
+import stamp_add from "/svg/stamp-add.svg?raw"
 </script>
 
 <template>
   <span class="trust">
     <Popper placement="right-end" @open:popper="onFetchTrust()">
-      <div class="stamp" v-html="stamp"></div>
+      <div v-if="trust !== null" class="stamp" v-html="stamp"></div>
+      <div v-else class="stamp-add" v-html="stamp_add"></div>
+
       <template #content>
         <div class="hovercard">
           <div class="content-header">
@@ -16,7 +19,10 @@ import stamp from "/svg/stamp.svg?raw"
           </div>
           <div v-if="trust === undefined">Loading...</div>
           <div v-else-if="trust === false">Error fetching trust</div>
-          <div v-else-if="trust === null">Not trusted</div>
+          <div v-else-if="trust === null">
+            Not trusted<br>
+            <a href="#" @click.prevent="$emit('trust')">trust this user</a>
+          </div>
           <div v-else>
             <user :pubkey="king" :ndk="ndk"/>
             <span v-if="trust && trust.length === 0">is king.</span>
@@ -37,7 +43,7 @@ import stamp from "/svg/stamp.svg?raw"
 <script>
 export default {
   name: 'trust',
-  props: ["ndk", "search_ndk", "king", "author", "context"],
+  props: ["ndk", "search_ndk", "king", "author", "context", "fetch_"],
   components: { Popper, User },
   data: function () {
     return {
@@ -47,6 +53,11 @@ export default {
   beforeMount() {
     if (this.king === this.author) {
       this.trust = []
+    }
+  },
+  mounted () {
+    if (this.fetch_) {
+      this.onFetchTrust()
     }
   },
   methods: {
@@ -59,8 +70,9 @@ export default {
       }
       return null
     },
+
     async onFetchTrust () {
-      if (this.trust !== null) {
+      if (this.trust !== undefined) {
         console.log("already fetched trust")
         return
       }
@@ -74,8 +86,9 @@ export default {
         }
       }
 
+      let r
       try {
-        let r = await this.search_ndk.fetchEvents(filter)
+        r = await this.search_ndk.fetchEvents(filter)
       } catch (e) {
         this.trust = false
         return
@@ -137,7 +150,7 @@ export default {
   border-left: 2px dotted var(--gray8);
   margin-left: 10px;
 }
-.stamp {
+.stamp, .stamp-add {
   display: inline-block;
   fill: var(--aqua3);
   width: 24px;

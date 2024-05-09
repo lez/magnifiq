@@ -1,9 +1,14 @@
 <script setup>
 import NDK, { NDKEvent, NDKNip07Signer }  from "@nostr-dev-kit/ndk";
 import Multiselect from './components/multiselect/Multiselect.vue'
+import User from './components/User.vue'
 </script>
 
 <template>
+  <div class="user">
+    <user v-if="user" :pubkey="user.pubkey" :ndk="ndk"/>
+  </div>
+
   <header>
     <a href="/">
       <img class="logo" src="../image/logo.png" width="250">
@@ -162,6 +167,7 @@ export default {
         content: this.$refs.content.value,
         tags
       })
+      console.log("Publishing event", event)
       let r = await event.publish()
       console.log("r", r)
       this.stored = r.size
@@ -292,6 +298,11 @@ pre {
   border-radius: 12px;
   overflow-x: hidden;
   overflow-y: scroll;
+}
+.user {
+  position: absolute;
+  top: 10px;
+  right: 20px;
 }
 
 </style>

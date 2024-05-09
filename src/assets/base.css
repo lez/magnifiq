@@ -85,10 +85,10 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg1: var(--gray1);
-    --bg2: var(--gray2);
-    --bg3: var(--gray3);
-    --bg4: var(--gray4);
-    --bg5: var(--gray5);
+    --bg2: var(--gray3);
+    --bg3: var(--gray4);
+    --bg4: var(--gray5);
+    --bg5: var(--gray6);
     --content-bg1: var(--gray3);
     --text1: var(--gray18);
     --text2: var(--gray16);

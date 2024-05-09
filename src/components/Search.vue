@@ -1,14 +1,17 @@
 <script setup>
 import Multiselect from './multiselect/Multiselect.vue'
-import NDK from "@nostr-dev-kit/ndk";
+import NDK, { NDKEvent, NDKNip07Signer }  from "@nostr-dev-kit/ndk";
 import Trust from './Trust.vue'
 import User from "./User.vue"
 import KingSelect from "./KingSelect.vue"
-import stamp from "../../svg/stamp.svg?raw"
+import stamp_add from "/svg/stamp-add.svg?raw"
 </script>
 
 <template>
   <div>
+    <div class="user">
+      <user v-if="pubkey" :pubkey="pubkey" :ndk="ndk"/>
+    </div>
     <div class="search">
       <multiselect
           v-model="value"
@@ -20,6 +23,7 @@ import stamp from "../../svg/stamp.svg?raw"
           openDirection="below"
           :hide-selected="true"
           :show-labels="true"
+          :customLabel="customLabel"
           :close-on-select="true"
           @search-change="onSearchChange"
           @select="onOptionSelected"
@@ -44,29 +48,39 @@ import stamp from "../../svg/stamp.svg?raw"
     </div>
 
     <div class="results">
-      <div class="result" v-for="r in results" :key="r.id">
-
-        <div class="result-header">
-          <a v-if="getTagValue(r, 'dest')" :href="getTagValue(r, 'dest')">{{ getTagValue(r, 'dest') }}</a>
-          <span v-else class="missing">Missing destination!</span>
-          <!-- <span class="explore"><a :href="'https://njump.me/'+r.id">o</a></span> --><!-- TODO: add relay data to nevent -->
+      <div v-if="indexer" class="indexer">
+        <div class="indexer-inner">
+          Results by <user :pubkey="indexer" :ndk="ndk"/>
+          <trust :king="king" :author="indexer" context="*" :ndk="ndk" :search_ndk="search_ndk" :fetch_="true" @trust="onTrustIndexer()"/>
         </div>
+      </div>
 
-        <div class="content">
-          {{ r.content }}
-        </div>
+      <div v-if="results.length && results[0] === null">There are no trusted results</div>
+      <div class="result" v-for="r in results" :key="r?.id">
+        <hr v-if="r === null" width="98%">
+        <div v-else>
+          <div class="result-header">
+            <a v-if="getTagValue(r, 'dest')" :href="getTagValue(r, 'dest')">{{ getTagValue(r, 'dest') }}</a>
+            <span v-else class="missing">Missing destination!</span>
+            <!-- <span class="explore"><a :href="'https://njump.me/'+r.id">o</a></span> --><!-- TODO: add relay data to nevent -->
+          </div>
 
-        <div class="tags">
-          <template v-for="tag in r.tags" :key="tag">
-            <span v-if="tag[0]=='s'">
-              {{ tag[1] }}
-            </span>
-          </template>
-        </div>
+          <div class="content">
+            {{ r.content }}
+          </div>
 
-        <div class="author">
-          Indexed by <user :pubkey="r.pubkey" :ndk="ndk" @click.once.prevent="onAuthorClick(r)"/>
-          <trust :king="king" :author="r.pubkey" context="search" :ndk="ndk" :search_ndk="search_ndk"/>
+          <div class="tags">
+            <template v-for="tag in r.tags" :key="tag">
+              <span v-if="tag[0]=='s'">
+                {{ tag[1] }}
+              </span>
+            </template>
+          </div>
+
+          <div v-if="!indexer" class="author">
+            Indexed by <user :pubkey="r.pubkey" :ndk="ndk" @click.once.prevent="onAuthorClick(r)"/>
+            <trust v-if="!r.unauthorized" :king="king" :author="r.pubkey" context="*" :ndk="ndk" :search_ndk="search_ndk"/>
+          </div>
         </div>
       </div>
     </div>
@@ -84,33 +98,45 @@ export default {
       results: [],
       ndk: null,
       search_ndk: null,
-      king: "cfd7df62799a22e384a4ab5da8c4026c875b119d0f47c2716b20cdac9cc1f1a6",
+      king: "df5134e31206e6a5c898ea12efaa2c8dadc556e2ab1a273ab383d817c3404ff1",
+      indexer: null,
+      indexer_trusted: false,
+      pubkey: null,
     }
   },
   beforeMount () {
     let search_relays = ["ws://127.0.0.1:8080"]
-    let profile_relays = ["wss://bitcoinmaximalists.online"]
+    let profile_relays = ["wss://bitcoinmaximalists.online", "wss://relay.primal.net", "wss://relay.damus.io"]
 
     this.search_ndk = new NDK({
-      explicitRelayUrls: search_relays
+      explicitRelayUrls: search_relays,
     })
     this.ndk = new NDK({
+      //TODO: if an unreachable relay is in the list, the search relay is not tried :/
       explicitRelayUrls: search_relays.concat(profile_relays)
     })
   },
-  mounted: function() {
+  async mounted () {
     window.x = this
     this.$refs.search.activate()
     window.localStorage.debug = ''
 
-    this.ndk.connect()
-    this.search_ndk.connect()
+    await this.ndk.connect()
+    await this.search_ndk.connect()
+
+    this.search_ndk.signer = new NDKNip07Signer()
+
+    let user = await this.search_ndk.signer.user()
+    console.log('user', user)
+    this.pubkey = user?.pubkey
+    console.log('pubkey', this.pubkey)
   },
   methods: {
     async onAuthorClick (result) {
       console.log("Click", result.pubkey);
       let u = this.ndk.getUser({pubkey: result.pubkey})
       this.value = ["indexer:"+u.npub]
+      this.$nextTick(this.onSearch)
     },
     async onOptionSelected (option) {
       console.log("onOptionSelected", option)
@@ -140,13 +166,13 @@ export default {
       console.log("Search!", Array.from(this.value))
 
       let tags = []
-      let indexer = null
+      this.indexer = null
 
       for (let t of this.value) {
         if (t.startsWith("indexer:")) {
           let npub = t.slice("indexer:".length)
           let u = this.ndk.getUser({ npub })
-          indexer = u.pubkey
+          this.indexer = u.pubkey
         } else {
           tags.push(t)
         }
@@ -159,20 +185,26 @@ export default {
         filter["&s"] = tags
       }
 
-      if (indexer) {
-        filter.authors = [indexer]
+      if (this.indexer) {
+        filter.authors = [this.indexer]
       } else {
         filter.trust = {
           root: this.king,
-          context: "search",
-          depth: 4
+          context: "*",
+          // depth: 4
         }
       }
 
       console.log("REQ filter", filter)
       let events = await this.search_ndk.fetchEvents(filter)
+      console.log("< REQ events", events)
+      let events_arr = Array.from(events)
 
-      this.results = Array.from(events).sort((a, b) => {
+      console.log("< REQ events_arr", events_arr)
+      let result_ids = new Set(events_arr.map(ev => ev.id))
+      console.log("Approved result ids", result_ids)
+
+      this.results = events_arr.sort((a, b) => {
         // Invalid events go to the bottom.
         if (this.getTagValue(a, "dest") && !this.getTagValue(b, "dest")) return -1;
         if (!this.getTagValue(a, "dest") && this.getTagValue(b, "dest")) return 1;
@@ -183,8 +215,30 @@ export default {
 
         return 0;
       })
-
       console.log("Results", this.results)
+
+      if (this.indexer) return
+
+      let hr = false
+      // Fetching unauthorized results.
+
+      filter = {...filter} // Make console log keep original filter.
+      delete filter["trust"]
+
+      console.log("unauthorized filter", filter)
+      let all_results = await this.search_ndk.fetchEvents(filter)
+
+      if (all_results.size === 0)
+        return
+
+      this.results.push(null) //<hr>
+
+      all_results.forEach(e => {
+        if (!result_ids.has(e.id)) {
+          e.unauthorized = true
+          this.results.push(e)
+        }
+      }, this)
     },
 
     scnt (event) {
@@ -198,15 +252,38 @@ export default {
     },
 
     // Return first value of tag by tagname.
-    getTagValue(event, tagname){
+    getTagValue (event, tagname){
       for (let t of event.tags) {
         if (t[0] == tagname) {
           return t[1]
         }
       }
       return null
-    }
-  }
+    },
+    customLabel (label) {
+      if (label.startsWith("indexer:")) {
+        return label.slice(0, 17) + "..." + label.slice(-4)
+      }
+      return label
+    },
+    async onTrustIndexer () {
+      if (!confirm("Trust this person to index sites?")) return
+
+      this.search_ndk.signer = new NDKNip07Signer()
+
+      let e = new NDKEvent(this.search_ndk, {
+        kind: 30077,
+        tags: [
+          ["d", this.indexer + "/*"],
+          ["c", "*"],
+          ["p", this.indexer],
+        ]
+      })
+
+      let r = await e.publish()
+      console.log("Trust published", r)
+    },
+  },
 }
 </script>
 
@@ -226,7 +303,7 @@ export default {
 }
 .multiselect__placeholder {
   font-size: 1.5em;
-  margin: 7px 15px;
+  margin: 4px 13px;
 }
 input.multiselect__input {
   color: var(--text2);
@@ -324,5 +401,25 @@ svg {
   width: 760px;
   display: flex;
   flex-direction: row;
+}
+.indexer {
+  background: var(--bg4);
+  border-radius: 12px;
+  padding: 8px;
+}
+.indexer-inner {
+  display: inline-flex;
+  align-items: center;
+}
+.user {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+}
+.stamp-add {
+  margin-left: 5px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 </style>

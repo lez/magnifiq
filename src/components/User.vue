@@ -1,6 +1,6 @@
 <template>
   <div class="user-wrapper">
-    <a v-if="link" class="user-name" :href="'http://njump.me/'+npub">
+    <a v-if="link" class="user-name" :href="'http://njump.me/'+npub" :title="npub + ' (' + user.pubkey + ')'">
       {{ name }}
     </a>
     <span v-else class="user-name">
@@ -27,6 +27,7 @@ export default {
     async fetch_name() {
       console.log("fetching name for", this.pubkey)
       await this.user.fetchProfile()
+      console.log("Profile for", JSON.stringify(this.pubkey), "is", JSON.stringify(this.user.profile))
     }
   },
   beforeMount: function() {
@@ -41,7 +42,7 @@ export default {
       if (this.user?.profile?.name) {
         return this.user.profile.name
       }
-      return this.npub.slice(0, 16)
+      return this.npub.slice(0, 9) + "..." + this.npub.slice(-4)
     }
   }
 }

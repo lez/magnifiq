@@ -28,4 +28,5 @@ if __name__ == '__main__':
         config.add_view(tags, route_name='tags', renderer='json')
         app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 4000, app)
+    print("Tagserver listening on 127.0.0.1:4000")
     server.serve_forever()
