@@ -105,7 +105,7 @@ export default {
     }
   },
   beforeMount () {
-    let search_relays = ["ws://127.0.0.1:8080"]
+    let search_relays = ["wss://relay.magnifiq.tech"]
     let profile_relays = ["wss://bitcoinmaximalists.online", "wss://relay.primal.net", "wss://relay.damus.io"]
 
     this.search_ndk = new NDK({
