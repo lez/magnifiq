@@ -106,7 +106,7 @@ export default {
     this.user = await this.signer.user()
     this.ndk = new NDK({
       signer: this.signer,
-      explicitRelayUrls: ["ws://127.0.0.1:8080"],
+      explicitRelayUrls: ["wss://relay.magnifiq.tech"],
     });
     await this.ndk.connect();
     console.log("User:", this.user.npub)
