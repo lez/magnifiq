@@ -41,7 +41,7 @@ import stamp_add from "/svg/stamp-add.svg?raw"
 
       <div class="menu-line">
         <div style="margin-left: auto;" />
-        <king-select v-model="king" :value="king" :ndk="ndk" />
+        <king-select v-model="king" :value="king" :ndk="ndk" :show_reset="king !== 'df5134e31206e6a5c898ea12efaa2c8dadc556e2ab1a273ab383d817c3404ff1'"/>
       </div>
 
       <button class="search-button" :disabled="!value.length" @click="onSearch">Search</button>
@@ -98,7 +98,7 @@ export default {
       results: [],
       ndk: null,
       search_ndk: null,
-      king: "df5134e31206e6a5c898ea12efaa2c8dadc556e2ab1a273ab383d817c3404ff1",
+      king: document.cookie.split('; ').find(c => c.startsWith('king='))?.split('=')[1] || "df5134e31206e6a5c898ea12efaa2c8dadc556e2ab1a273ab383d817c3404ff1",
       indexer: null,
       indexer_trusted: false,
       pubkey: null,

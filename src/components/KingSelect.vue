@@ -17,7 +17,8 @@ import Popper from 'vue3-popper'
     <template #content>
       <div class="popper-content">
         <div>The current king is <user :pubkey="value" :ndk="ndk"/></div>
-        <div class="new-king">Set to <input type="text" class="npub-input" placeholder="king's npub..."></div>
+        <div class="new-king">Set to <input type="text" class="npub-input" ref="npub" placeholder="king's npub..." @enter.prevent="onSetKing"><button @click="onSetKing">Set</button></div>
+        <a v-if="show_reset" href="#reset-king" @click="onResetKing()">reset king</a>
       </div>
     </template>
   </Popper>
@@ -26,7 +27,7 @@ import Popper from 'vue3-popper'
 
 <script>
 export default {
-  props: ["value", "ndk"],
+  props: ["value", "ndk", "show_reset"],
   data: function () {
     return {
       is_open: false
@@ -39,6 +40,23 @@ export default {
   methods: {
     setOpen (state) {
       this.is_open = state
+    },
+    onResetKing () {
+      document.cookie = "king=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; samesite=strict"
+      window.location.reload()
+    },
+    onSetKing () {
+      let npub = this.$refs.npub.value
+      console.log("king npub", npub)
+      let u = this.ndk.getUser({ npub })
+      if (!u) {
+        alert("Invalid npub.")
+        return
+      }
+      let pubkey = u.pubkey
+      document.cookie = `king=${pubkey}; max-age=31536000; path=/; samesite=strict`
+      console.log("king is set to", pubkey)
+      window.location.reload()
     }
   },
   computed: {
